@@ -161,7 +161,7 @@ public class PlayerController : MonoBehaviour
             PlayerPrefs.SetInt("IsRestarted", 1); // Сохраняем флаг перезапуска
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
-        if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift)&&isRun)
+        if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift)&&isRun && (Input.GetAxis("Horizontal")!=0 || Input.GetAxis("Vertical")!=0))
         {
             isCrouching = true;
             isSliding = true;
