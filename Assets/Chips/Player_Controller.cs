@@ -14,9 +14,13 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] GameObject camera;
+    [SerializeField] GameObject camera2;
+    [SerializeField] SmoothMovement smoothMovement;
     [SerializeField] GameObject Menu;
     [SerializeField] Transform playerPosition;
     [SerializeField] CharacterController cc;
+    [SerializeField] CharacterController cc2;
     [SerializeField] float Speed = 10f;
     private float? oldSpeed = null;
     [SerializeField] float Sprint = 15f;
@@ -46,6 +50,7 @@ public class PlayerController : MonoBehaviour
     private bool a = false;
     private bool onWind;
     private bool isMenuOpen = true;
+    private bool IsFirstPlayer = true;
 
     public float gravity = -9.81f;
     [NonSerialized] public float? staticGravity = null;
@@ -93,9 +98,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        Wind();
-        staminaCanvas.fillAmount =1 - (timerStamina /stamina) ;
-        
+        if (IsFirstPlayer) { 
+         Wind();
+        staminaCanvas.fillAmount = 1 - (timerStamina / stamina);
+
         if (Input.GetKey(KeyCode.LeftShift) && timerStamina <= stamina && isRun && ground._IsGround())
         {
             Speed = Sprint;
@@ -106,14 +112,14 @@ public class PlayerController : MonoBehaviour
         {
             isRun = false;
         }
-        if(!isRun)
+        if (!isRun)
         {
             Speed = (float)oldSpeed;
             if (timerStamina >= 0)
             {
-                timerStamina-=1f * Time.deltaTime;
+                timerStamina -= 1f * Time.deltaTime;
             }
-            else if(timerStamina <TimeStart)
+            else if (timerStamina < TimeStart)
             {
                 isRun = true;
             }
@@ -138,21 +144,22 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetButtonDown("Jump") && ground._IsGround())
         {
-            Jump();   
+            Jump();
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (!switchd)
             {
-                
+
                 umbrella.OpenUmbrella();
                 switchd = true;
                 umbrellaIsOpen = true;
-            }else if (switchd)
+            }
+            else if (switchd)
             {
                 umbrella.CloseUmbrella();
                 switchd = false;
-                umbrellaIsOpen=false;
+                umbrellaIsOpen = false;
             }
         }
 
@@ -161,7 +168,7 @@ public class PlayerController : MonoBehaviour
             PlayerPrefs.SetInt("IsRestarted", 1); // Сохраняем флаг перезапуска
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
-        if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift)&&isRun)
+        if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift) && isRun && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0))
         {
             isCrouching = true;
             isSliding = true;
@@ -179,29 +186,72 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        if (isSliding)
-        {
-            if (slideTimer > 0)
+            if (isSliding)
             {
-                slideTimer -= Time.deltaTime;
-                Vector3 slideDirection = PlayerBody.transform.forward.normalized;
-                cc.Move(slideDirection * slideSpeed * Time.deltaTime);
-                cc.height = SlideHeight;
-
-                if (slideTimer <= 0)
+                if (slideTimer > 0)
                 {
-                    isSliding = false;
-                    isCrouching = true;
-                    crouchRecoverTimer = crouchRecoverTime;
+                    slideTimer -= Time.deltaTime;
+                    Vector3 slideDirection = PlayerBody.transform.forward.normalized;
+                    cc.Move(slideDirection * slideSpeed * Time.deltaTime);
+                    cc.height = SlideHeight;
+
+                    if (slideTimer <= 0)
+                    {
+                        isSliding = false;
+                        isCrouching = true;
+                        crouchRecoverTimer = crouchRecoverTime;
+                    }
+                }
+
+
+                else
+                {
+                    cc.height = NormalHeight;
                 }
             }
+            
+              
+    }else if(!IsFirstPlayer)
+            {
+                float vertical = Input.GetAxisRaw("Vertical");
+                float horizontal = Input.GetAxisRaw("Horizontal");
+                float up = 0;
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    up = 1;
+                }else if (Input.GetKey(KeyCode.LeftAlt))
+                {
+                    up = -1;
+                }
+                else
+                {
+                    up = 0;
+                }
+                Vector3 moveDirection = (vertical * transform.forward + horizontal * transform.right).normalized;
+                Vector3 moveUp = new Vector3(0, up, 0);
+                    cc2.Move(moveDirection * Speed * Time.deltaTime);
+                    cc2.Move(moveUp * Speed * Time.deltaTime);
+              
+              
 
-        }
-        else
-        {
-            cc.height = NormalHeight;
-        }
-            OpenMenu();
+            }
+         if (IsFirstPlayer && Input.GetKeyDown(KeyCode.Tab))
+              {
+            camera.SetActive(false);
+            camera2.SetActive(true);
+                    IsFirstPlayer = false;
+                cc.enabled = false;
+                cc2.enabled = true;
+                smoothMovement.enabled = false;
+              }else if(!IsFirstPlayer && Input.GetKeyDown(KeyCode.Tab))
+               {
+            camera.SetActive(true);
+            camera2.SetActive(false);
+                    IsFirstPlayer = true;
+                cc.enabled = true;
+                cc2.enabled = false;
+                smoothMovement.enabled = true;
+            }     OpenMenu();
     }
     public void RespawnPlayer()=> PlayerPrefs.SetInt("IsRestarted", 1);
     private void FixedUpdate()
