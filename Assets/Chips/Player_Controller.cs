@@ -21,8 +21,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform playerPosition;
     [SerializeField] CharacterController cc;
     [SerializeField] CharacterController cc2;
-    [SerializeField] float Speed = 10f;
-    private float? oldSpeed = null;
+   public float Speed = 10f;
+    public float? oldSpeed = null;
     [SerializeField] float Sprint = 15f;
     public float stamina = 10f;
     [SerializeField] Image staminaCanvas;
@@ -92,6 +92,7 @@ public class PlayerController : MonoBehaviour
         }
         Time.timeScale = 1;
         RespawnPlayer();
+        Cursor.lockState = CursorLockMode.Locked;
         
     }
 
