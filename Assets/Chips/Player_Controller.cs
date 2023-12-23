@@ -203,12 +203,11 @@ public class PlayerController : MonoBehaviour
                     }
                 }
 
-
-                else
+               
+            } else if(!isSliding)
                 {
                     cc.height = NormalHeight;
                 }
-            }
             
               
     }else if(!IsFirstPlayer)
@@ -311,10 +310,6 @@ public class PlayerController : MonoBehaviour
         if (velosity.y <= DeathHeight)
         {
             aa = true;
-            
-        }else if (velosity.y >= DeathHeight)
-        {
-            aa = false;
         }
         if (aa && ground._IsGround())
         {
