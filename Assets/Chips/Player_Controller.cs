@@ -260,7 +260,7 @@ public class PlayerController : MonoBehaviour
         if (PlayerPrefs.GetInt("IsRestarted", 0) == 1)
         {
             Checkpoint.TeleportToLastCheckpoint(transform);
-            PlayerPrefs.SetInt("IsRestarted", 0); // —брасываем флаг после использовани€
+            PlayerPrefs.SetInt("IsRestarted", 0); 
         }
 
     }
@@ -294,16 +294,16 @@ public class PlayerController : MonoBehaviour
             PlayerBody.transform.rotation = Quaternion.Lerp(PlayerBody.transform.rotation, targetRotation, rotationSpeed);
         }
         Vector3 ladder = new Vector3(0, vertical, 0);
- Vector3 horMove = new Vector3(horizontal, 0, 0);
-        if (!LadderEnter)
-        {
-            cc.Move(moveDirection * Speed * Time.deltaTime);
+        Vector3 horMove = new Vector3(horizontal, 0, 0);
+            if (!LadderEnter)
+            {
+             cc.Move(moveDirection * Speed * Time.deltaTime);
             
-        }else if (LadderEnter)
-        {
-            cc.Move(horMove *  Speed * Time.deltaTime);
-            cc.Move(ladder * LadderSpeed * Time.deltaTime); 
-        }
+            }else if (LadderEnter)
+            {
+             cc.Move(horMove *  Speed * Time.deltaTime);
+             cc.Move(ladder * LadderSpeed * Time.deltaTime); 
+            }
     }
    public void Gravity()
     {
