@@ -9,6 +9,7 @@ public class Desk_animation : MonoBehaviour
       public string animation;
     public string animation2;
 	public string currentAnimation;
+    public bool spirit;
 
     void Animationn(string animation)
  	{
@@ -27,22 +28,35 @@ public class Desk_animation : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("Player"))
+        if(other.CompareTag("Player")&&spirit == false)
         { 
            
             
               Animationn(animation);;
-            }
-           
-        
+        }
+        if (other.CompareTag("spirit") && spirit == true)
+        {
+
+
+            Animationn(animation); ;
+        }
+
+
     }
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && spirit == false)
         {
 
 
           currentAnimation = animation2;
+
+        }
+        if (other.CompareTag("spirit") && spirit == true)
+        {
+
+
+            currentAnimation = animation2;
 
         }
     }

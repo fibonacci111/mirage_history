@@ -21,8 +21,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform playerPosition;
     [SerializeField] CharacterController cc;
     [SerializeField] CharacterController cc2;
-    [SerializeField] float Speed = 10f;
-    private float? oldSpeed = null;
+   public float Speed = 10f;
+    public float? oldSpeed = null;
     [SerializeField] float Sprint = 15f;
     public float stamina = 10f;
     [SerializeField] Image staminaCanvas;
@@ -92,6 +92,7 @@ public class PlayerController : MonoBehaviour
         }
         Time.timeScale = 1;
         RespawnPlayer();
+        Cursor.lockState = CursorLockMode.Locked;
         
     }
 
@@ -102,29 +103,17 @@ public class PlayerController : MonoBehaviour
          Wind();
         staminaCanvas.fillAmount = 1 - (timerStamina / stamina);
 
-        if (Input.GetKey(KeyCode.LeftShift) && timerStamina <= stamina && isRun && ground._IsGround())
+        if (Input.GetKey(KeyCode.LeftShift) &&  isRun && ground._IsGround())
         {
             Speed = Sprint;
-            timerStamina += 1f * Time.deltaTime;
+           
             isRun = true;
         }
-        else if (Input.GetKeyUp(KeyCode.LeftShift) || timerStamina >= stamina || !ground._IsGround())
-        {
+        else if (Input.GetKeyUp(KeyCode.LeftShift)  || !ground._IsGround())
+        {Speed = (float)oldSpeed;
             isRun = false;
         }
-        if (!isRun)
-        {
-            Speed = (float)oldSpeed;
-            if (timerStamina >= 0)
-            {
-                timerStamina -= 1f * Time.deltaTime;
-            }
-            else if (timerStamina < TimeStart)
-            {
-                isRun = true;
-            }
-
-        }
+       
         ground._IsGround();
         if (!LadderEnter)
         {
@@ -259,7 +248,7 @@ public class PlayerController : MonoBehaviour
         if (PlayerPrefs.GetInt("IsRestarted", 0) == 1)
         {
             Checkpoint.TeleportToLastCheckpoint(transform);
-            PlayerPrefs.SetInt("IsRestarted", 0); // —брасываем флаг после использовани€
+            PlayerPrefs.SetInt("IsRestarted", 0); 
         }
 
     }
@@ -293,16 +282,16 @@ public class PlayerController : MonoBehaviour
             PlayerBody.transform.rotation = Quaternion.Lerp(PlayerBody.transform.rotation, targetRotation, rotationSpeed);
         }
         Vector3 ladder = new Vector3(0, vertical, 0);
- Vector3 horMove = new Vector3(horizontal, 0, 0);
-        if (!LadderEnter)
-        {
-            cc.Move(moveDirection * Speed * Time.deltaTime);
+        Vector3 horMove = new Vector3(horizontal, 0, 0);
+            if (!LadderEnter)
+            {
+             cc.Move(moveDirection * Speed * Time.deltaTime);
             
-        }else if (LadderEnter)
-        {
-            cc.Move(horMove *  Speed * Time.deltaTime);
-            cc.Move(ladder * LadderSpeed * Time.deltaTime); 
-        }
+            }else if (LadderEnter)
+            {
+             cc.Move(horMove *  Speed * Time.deltaTime);
+             cc.Move(ladder * LadderSpeed * Time.deltaTime); 
+            }
     }
    public void Gravity()
     {

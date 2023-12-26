@@ -9,6 +9,6 @@ EditorBuildSettings:
     path: Assets/Chips/Chips2/Menu.unity
     guid: c113ec3495dc0364ca22c996dd39e1e0
   - enabled: 1
-    path: Assets/Why Dark Soup/DS3.unity
-    guid: c363a472b71d6a7499bb0b0a934413fc
+    path: Assets/Hml/Scene/6.unity
+    guid: c1e9c8b968f127e42b4d767e4d65d7b5
   m_configObjects: {}
