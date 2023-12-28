@@ -91,8 +91,10 @@ Material:
     - _ClearCoatSmoothness: 0
     - _Cull: 2
     - _Cutoff: 0.5
+    - _Deform: 0.04
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
+    - _Displacement: 0.04
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
@@ -116,8 +118,8 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _CoreColor: {r: 4, g: 4, b: 4, a: 0}
-    - _EdgeColor: {r: 0.05156029, g: 0.9912103, b: 1.490566, a: 0}
+    - _CoreColor: {r: 7.1297374, g: 7.1297374, b: 7.1297374, a: 0}
+    - _EdgeColor: {r: 0, g: 1.182559, b: 7.9600906, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
