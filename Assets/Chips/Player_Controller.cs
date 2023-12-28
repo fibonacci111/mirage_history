@@ -16,6 +16,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] GameObject camera;
     [SerializeField] GameObject camera2;
+    [SerializeField] Rigidbody rigidBody;
     [SerializeField] SmoothMovement smoothMovement;
     [SerializeField] GameObject Menu;
     [SerializeField] Transform playerPosition;
@@ -99,19 +100,30 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if(Menu.active == true)
+        {
+            Cursor.lockState = CursorLockMode.Confined;
+        }else if(Menu.active == false)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
         if (IsFirstPlayer) { 
          Wind();
         staminaCanvas.fillAmount = 1 - (timerStamina / stamina);
 
-        if (Input.GetKey(KeyCode.LeftShift) &&  isRun && ground._IsGround())
+        if (Input.GetKey(KeyCode.LeftShift) && ground._IsGround())
         {
+
             Speed = Sprint;
            
             isRun = true;
+
         }
         else if (Input.GetKeyUp(KeyCode.LeftShift)  || !ground._IsGround())
-        {Speed = (float)oldSpeed;
-            isRun = false;
+        {
+                Speed = (float)oldSpeed;
+
+                isRun = false;
         }
        
         ground._IsGround();
@@ -152,11 +164,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (death)
-        {
-            PlayerPrefs.SetInt("IsRestarted", 1); // Сохраняем флаг перезапуска
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
+        
         if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift) && isRun && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0))
         {
             isCrouching = true;
@@ -219,6 +227,7 @@ public class PlayerController : MonoBehaviour
                 Vector3 moveUp = new Vector3(0, up, 0);
                     cc2.Move(moveDirection * Speed * Time.deltaTime);
                     cc2.Move(moveUp * Speed * Time.deltaTime);
+          
               
               
 
@@ -228,11 +237,15 @@ public class PlayerController : MonoBehaviour
             camera.SetActive(false);
             camera2.SetActive(true);
                     IsFirstPlayer = false;
+
+            rigidBody.isKinematic = true;
                 cc.enabled = false;
                 cc2.enabled = true;
                 smoothMovement.enabled = false;
               }else if(!IsFirstPlayer && Input.GetKeyDown(KeyCode.Tab))
                {
+
+            rigidBody.isKinematic = false;
             camera.SetActive(true);
             camera2.SetActive(false);
                     IsFirstPlayer = true;
@@ -240,6 +253,11 @@ public class PlayerController : MonoBehaviour
                 cc2.enabled = false;
                 smoothMovement.enabled = true;
             }     OpenMenu();
+        if (death)
+        {
+            PlayerPrefs.SetInt("IsRestarted", 1); // Сохраняем флаг перезапуска
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
     }
     public void RespawnPlayer()=> PlayerPrefs.SetInt("IsRestarted", 1);
     private void FixedUpdate()
