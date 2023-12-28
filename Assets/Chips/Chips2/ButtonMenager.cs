@@ -11,6 +11,7 @@ public class ButtonMenager1 : MonoBehaviour
     public  static ButtonMenager1 instance;
     public bool IsDelete = false;
 
+
     private void Awake()
     {
         
