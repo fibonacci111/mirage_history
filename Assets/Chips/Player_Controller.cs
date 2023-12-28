@@ -16,13 +16,14 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] GameObject camera;
     [SerializeField] GameObject camera2;
+    [SerializeField] Rigidbody rigidBody;
     [SerializeField] SmoothMovement smoothMovement;
     [SerializeField] GameObject Menu;
     [SerializeField] Transform playerPosition;
     [SerializeField] CharacterController cc;
     [SerializeField] CharacterController cc2;
-    [SerializeField] float Speed = 10f;
-    private float? oldSpeed = null;
+   public float Speed = 10f;
+    public float? oldSpeed = null;
     [SerializeField] float Sprint = 15f;
     public float stamina = 10f;
     [SerializeField] Image staminaCanvas;
@@ -92,39 +93,39 @@ public class PlayerController : MonoBehaviour
         }
         Time.timeScale = 1;
         RespawnPlayer();
+        Cursor.lockState = CursorLockMode.Locked;
         
     }
 
 
     void Update()
     {
+        if(Menu.active == true)
+        {
+            Cursor.lockState = CursorLockMode.Confined;
+        }else if(Menu.active == false)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
         if (IsFirstPlayer) { 
          Wind();
         staminaCanvas.fillAmount = 1 - (timerStamina / stamina);
 
-        if (Input.GetKey(KeyCode.LeftShift) && timerStamina <= stamina && isRun && ground._IsGround())
+        if (Input.GetKey(KeyCode.LeftShift) && ground._IsGround())
         {
+
             Speed = Sprint;
-            timerStamina += 1f * Time.deltaTime;
+           
             isRun = true;
-        }
-        else if (Input.GetKeyUp(KeyCode.LeftShift) || timerStamina >= stamina || !ground._IsGround())
-        {
-            isRun = false;
-        }
-        if (!isRun)
-        {
-            Speed = (float)oldSpeed;
-            if (timerStamina >= 0)
-            {
-                timerStamina -= 1f * Time.deltaTime;
-            }
-            else if (timerStamina < TimeStart)
-            {
-                isRun = true;
-            }
 
         }
+        else if (Input.GetKeyUp(KeyCode.LeftShift)  || !ground._IsGround())
+        {
+                Speed = (float)oldSpeed;
+
+                isRun = false;
+        }
+       
         ground._IsGround();
         if (!LadderEnter)
         {
@@ -163,11 +164,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (death)
-        {
-            PlayerPrefs.SetInt("IsRestarted", 1); // Сохраняем флаг перезапуска
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-        }
+        
         if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift) && isRun && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0))
         {
             isCrouching = true;
@@ -230,6 +227,7 @@ public class PlayerController : MonoBehaviour
                 Vector3 moveUp = new Vector3(0, up, 0);
                     cc2.Move(moveDirection * Speed * Time.deltaTime);
                     cc2.Move(moveUp * Speed * Time.deltaTime);
+          
               
               
 
@@ -239,11 +237,15 @@ public class PlayerController : MonoBehaviour
             camera.SetActive(false);
             camera2.SetActive(true);
                     IsFirstPlayer = false;
+
+            rigidBody.isKinematic = true;
                 cc.enabled = false;
                 cc2.enabled = true;
                 smoothMovement.enabled = false;
               }else if(!IsFirstPlayer && Input.GetKeyDown(KeyCode.Tab))
                {
+
+            rigidBody.isKinematic = false;
             camera.SetActive(true);
             camera2.SetActive(false);
                     IsFirstPlayer = true;
@@ -251,6 +253,11 @@ public class PlayerController : MonoBehaviour
                 cc2.enabled = false;
                 smoothMovement.enabled = true;
             }     OpenMenu();
+        if (death)
+        {
+            PlayerPrefs.SetInt("IsRestarted", 1); // Сохраняем флаг перезапуска
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
     }
     public void RespawnPlayer()=> PlayerPrefs.SetInt("IsRestarted", 1);
     private void FixedUpdate()
@@ -259,7 +266,7 @@ public class PlayerController : MonoBehaviour
         if (PlayerPrefs.GetInt("IsRestarted", 0) == 1)
         {
             Checkpoint.TeleportToLastCheckpoint(transform);
-            PlayerPrefs.SetInt("IsRestarted", 0); // Сбрасываем флаг после использования
+            PlayerPrefs.SetInt("IsRestarted", 0); 
         }
 
     }
@@ -293,16 +300,16 @@ public class PlayerController : MonoBehaviour
             PlayerBody.transform.rotation = Quaternion.Lerp(PlayerBody.transform.rotation, targetRotation, rotationSpeed);
         }
         Vector3 ladder = new Vector3(0, vertical, 0);
- Vector3 horMove = new Vector3(horizontal, 0, 0);
-        if (!LadderEnter)
-        {
-            cc.Move(moveDirection * Speed * Time.deltaTime);
+        Vector3 horMove = new Vector3(horizontal, 0, 0);
+            if (!LadderEnter)
+            {
+             cc.Move(moveDirection * Speed * Time.deltaTime);
             
-        }else if (LadderEnter)
-        {
-            cc.Move(horMove *  Speed * Time.deltaTime);
-            cc.Move(ladder * LadderSpeed * Time.deltaTime); 
-        }
+            }else if (LadderEnter)
+            {
+             cc.Move(horMove *  Speed * Time.deltaTime);
+             cc.Move(ladder * LadderSpeed * Time.deltaTime); 
+            }
     }
    public void Gravity()
     {
