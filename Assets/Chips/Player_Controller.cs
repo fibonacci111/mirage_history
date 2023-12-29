@@ -22,6 +22,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] Transform playerPosition;
     [SerializeField] CharacterController cc;
     [SerializeField] CharacterController cc2;
+
+    public float UmbrellaKD = 10f;
+    private float _UmbrellaTimer = 0f;
+    private bool _canOpen = true;
+
    public float Speed = 10f;
     public float? oldSpeed = null;
     [SerializeField] float Sprint = 15f;
@@ -103,6 +108,7 @@ public class PlayerController : MonoBehaviour
         if(Menu.active == true)
         {
             Cursor.lockState = CursorLockMode.Confined;
+
         }else if(Menu.active == false)
         {
             Cursor.lockState = CursorLockMode.Locked;
@@ -147,22 +153,36 @@ public class PlayerController : MonoBehaviour
         {
             Jump();
         }
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E) )
         {
-            if (!switchd)
+            if (!switchd && _canOpen)
             {
 
                 umbrella.OpenUmbrella();
+
                 switchd = true;
                 umbrellaIsOpen = true;
             }
             else if (switchd)
             {
+
                 umbrella.CloseUmbrella();
                 switchd = false;
                 umbrellaIsOpen = false;
+                    _canOpen = false;
+
             }
         }
+
+            if (!_canOpen)
+            {
+                _UmbrellaTimer += 1f * Time.deltaTime;
+                if(_UmbrellaTimer>UmbrellaKD)
+                {
+                    _UmbrellaTimer = 0f;
+                    _canOpen = true;
+                }
+            }
 
         
         if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift) && isRun && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0))
@@ -238,14 +258,14 @@ public class PlayerController : MonoBehaviour
             camera2.SetActive(true);
                     IsFirstPlayer = false;
 
-            rigidBody.isKinematic = true;
+            rigidBody.isKinematic = false;
                 cc.enabled = false;
                 cc2.enabled = true;
                 smoothMovement.enabled = false;
               }else if(!IsFirstPlayer && Input.GetKeyDown(KeyCode.Tab))
                {
 
-            rigidBody.isKinematic = false;
+            rigidBody.isKinematic = true;
             camera.SetActive(true);
             camera2.SetActive(false);
                     IsFirstPlayer = true;
@@ -277,7 +297,7 @@ public class PlayerController : MonoBehaviour
         {
             Menu.SetActive(true);
             isMenuOpen = false;
-        }else if(Input.GetKeyDown(KeyCode.Escape) && isMenuOpen)
+        }else if(Input.GetKeyDown(KeyCode.Escape) && !isMenuOpen)
         {
             Menu.SetActive(false);
             isMenuOpen = true;
