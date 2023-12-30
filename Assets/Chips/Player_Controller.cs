@@ -23,11 +23,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] CharacterController cc;
     [SerializeField] CharacterController cc2;
 
+    [SerializeField] Animator anim;
+
     public float UmbrellaKD = 10f;
     private float _UmbrellaTimer = 0f;
     private bool _canOpen = true;
 
-   public float Speed = 10f;
+    public float Speed = 10f;
     public float? oldSpeed = null;
     [SerializeField] float Sprint = 15f;
     public float stamina = 10f;
@@ -41,16 +43,8 @@ public class PlayerController : MonoBehaviour
     [NonSerialized] public float? oldJumpHeight = null;
     private Vector3 moveDirection;
     [SerializeField] GameObject PlayerBody;
-   
-    private bool isCrouching = false;
-    private bool isSliding = false;
-    public float slideSpeed = 5.0f; 
-    public float slideDuration = 2.0f; 
-    private float slideTimer = 0.0f;
-    public float crouchRecoverTime = 1.5f; // Время восстановления после приседания
-    private float crouchRecoverTimer = 0.0f;
-    public float SlideHeight;
-    public float NormalHeight = 2;
+
+    
 
     private bool switchd;
     private bool a = false;
@@ -66,7 +60,7 @@ public class PlayerController : MonoBehaviour
     [NonSerialized] public bool umbrellaIsOpen;
     [NonSerialized] public bool umbrellaOnWind;
     public bool LadderEnter;
-
+    private bool isGrounded;
     [SerializeField] float DeathHeight;
 
     Vector3 velosity;
@@ -74,17 +68,25 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GroundChecker ground;
     [SerializeField] Umbrella umbrella;
     public static PlayerController Player_Singltone;
+
+    float SpeedActive;
+    float JumpActive;
+    float UmbrellaActive;
+    float LandActive;
+    bool aa;
    
+    [SerializeField] float SpeedOverclocking;
+
     [NonSerialized] public bool death;
     private void Awake()
     {
         Singl();
-        
+
     }
     public void Singl()
     {
         Player_Singltone = this;
-        
+
     }
 
     private void Start()
@@ -99,205 +101,227 @@ public class PlayerController : MonoBehaviour
         Time.timeScale = 1;
         RespawnPlayer();
         Cursor.lockState = CursorLockMode.Locked;
-        
+
     }
 
 
     void Update()
     {
-        if(Menu.active == true)
+        anim.SetFloat("Idle_Walking_Run", SpeedActive);
+        anim.SetFloat("Idle_Jump_InAir_Landing", JumpActive);
+     
+        if (ground._IsGround() != isGrounded)
+        {
+            isGrounded = !isGrounded;
+            if (isGrounded)
+            {
+
+                anim.SetBool("IsJumping", false);
+
+                if (!aa)
+                {
+                    anim.CrossFade("Landing_Opacity", 0.2f);
+                }
+              
+                JumpActive = 3;
+
+
+            }
+            else
+            {
+
+               
+                JumpActive = 2;
+                   
+              
+                 anim.SetBool("IsJumping", true);
+        
+            }
+
+
+         
+          
+        }
+
+
+
+
+
+
+        if (Input.GetAxis("Horizontal") != 0 && Input.GetAxis("Vertical") != 0)
+        {
+            if (isGrounded)
+            {
+                
+                anim.SetBool("IsJumping", false);
+            }
+        }
+
+        if (Menu.active == true)
         {
             Cursor.lockState = CursorLockMode.Confined;
 
-        }else if(Menu.active == false)
+        }
+        else if (Menu.active == false)
         {
             Cursor.lockState = CursorLockMode.Locked;
         }
-        if (IsFirstPlayer) { 
-         Wind();
-        staminaCanvas.fillAmount = 1 - (timerStamina / stamina);
-
-        if (Input.GetKey(KeyCode.LeftShift) && ground._IsGround())
+        if (IsFirstPlayer)
         {
+            Wind();
+            staminaCanvas.fillAmount = 1 - (timerStamina / stamina);
 
-            Speed = Sprint;
            
-            isRun = true;
 
-        }
-        else if (Input.GetKeyUp(KeyCode.LeftShift)  || !ground._IsGround())
-        {
-                Speed = (float)oldSpeed;
-
-                isRun = false;
-        }
-       
-        ground._IsGround();
-        if (!LadderEnter)
-        {
-            Gravity();
-        }
-        if (!isSliding)
-        {
-            Controller();
-        }
-        if (umbrellaIsOpen)
-        {
-            JumpHeight = umbrella.UmbrellaJumpHeight;
-        }
-        else
-        {
-            JumpHeight = (float)oldJumpHeight;
-        }
-        if (Input.GetButtonDown("Jump") && ground._IsGround())
-        {
-            Jump();
-        }
-        if (Input.GetKeyDown(KeyCode.E) )
-        {
-            if (!switchd && _canOpen)
+            ground._IsGround();
+            if (!LadderEnter)
             {
-
-                umbrella.OpenUmbrella();
-
-                switchd = true;
-                umbrellaIsOpen = true;
+                Gravity();
             }
-            else if (switchd)
+          
+                Controller();
+            
+            if (umbrellaIsOpen)
             {
+                JumpHeight = umbrella.UmbrellaJumpHeight;
+            }
+            else
+            {
+                JumpHeight = (float)oldJumpHeight;
+            }
+            if (Input.GetButtonDown("Jump") && ground._IsGround())
+            {
+                
+                
+                Jump();
+            }
+           
+            if (Input.GetKeyDown(KeyCode.E) && !isGrounded)
+            { 
+                if (!switchd && _canOpen)
+                {
+                    anim.SetBool("IsUmbrella", true);
+                    
+                    anim.SetFloat("InAir_UmbrellaOn_Soaring_UmbrellaLanding", 2);
+                    umbrella.OpenUmbrella();
 
+                    switchd = true;
+                    umbrellaIsOpen = true;
+                    aa = true;
+                }
+                else if (switchd || isGrounded)
+                {
+                    aa = false;
+
+                    umbrella.CloseUmbrella();
+                    switchd = false;
+                    umbrellaIsOpen = false;
+                    _canOpen = false;
+                    
+                    anim.SetBool("IsUmbrella", false); 
+                    anim.CrossFade("Umbrella_Landing_Opacity", 0.2f);
+
+                }
+            }
+            if (isGrounded && aa)
+            {
+                
+                anim.SetBool("IsUmbrella", false);
+                anim.CrossFade("Umbrella_Landing_Opacity", 0.2f);
                 umbrella.CloseUmbrella();
                 switchd = false;
                 umbrellaIsOpen = false;
-                    _canOpen = false;
-
+                aa = false;
+              
             }
-        }
 
             if (!_canOpen)
             {
                 _UmbrellaTimer += 1f * Time.deltaTime;
-                if(_UmbrellaTimer>UmbrellaKD)
+                if (_UmbrellaTimer > UmbrellaKD)
                 {
                     _UmbrellaTimer = 0f;
                     _canOpen = true;
                 }
             }
 
-        
-        if (Input.GetKeyDown(KeyCode.C) && Input.GetKey(KeyCode.LeftShift) && isRun && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0))
-        {
-            isCrouching = true;
-            isSliding = true;
-            slideTimer = slideDuration;
+
         }
-        if (isCrouching)
+        else if (!IsFirstPlayer)
         {
-            if (crouchRecoverTimer > 0)
+            float vertical = Input.GetAxisRaw("Vertical");
+            float horizontal = Input.GetAxisRaw("Horizontal");
+            float up = 0;
+            if (Input.GetKey(KeyCode.LeftShift))
             {
-                crouchRecoverTimer -= Time.deltaTime;
-
-                if (crouchRecoverTimer <= 0)
-                {
-                    isCrouching = false;
-                }
+                up = 1;
             }
+            else if (Input.GetKey(KeyCode.LeftAlt))
+            {
+                up = -1;
+            }
+            else
+            {
+                up = 0;
+            }
+            Vector3 moveDirection = (vertical * transform.forward + horizontal * transform.right).normalized;
+            Vector3 moveUp = new Vector3(0, up, 0);
+            cc2.Move(moveDirection * Speed * Time.deltaTime);
+            cc2.Move(moveUp * Speed * Time.deltaTime);
+
+
+
+
         }
-            if (isSliding)
-            {
-                if (slideTimer > 0)
-                {
-                    slideTimer -= Time.deltaTime;
-                    Vector3 slideDirection = PlayerBody.transform.forward.normalized;
-                    cc.Move(slideDirection * slideSpeed * Time.deltaTime);
-                    cc.height = SlideHeight;
-
-                    if (slideTimer <= 0)
-                    {
-                        isSliding = false;
-                        isCrouching = true;
-                        crouchRecoverTimer = crouchRecoverTime;
-                    }
-                }
-
-               
-            } else if(!isSliding)
-                {
-                    cc.height = NormalHeight;
-                }
-            
-              
-    }else if(!IsFirstPlayer)
-            {
-                float vertical = Input.GetAxisRaw("Vertical");
-                float horizontal = Input.GetAxisRaw("Horizontal");
-                float up = 0;
-                if (Input.GetKey(KeyCode.LeftShift))
-                {
-                    up = 1;
-                }else if (Input.GetKey(KeyCode.LeftAlt))
-                {
-                    up = -1;
-                }
-                else
-                {
-                    up = 0;
-                }
-                Vector3 moveDirection = (vertical * transform.forward + horizontal * transform.right).normalized;
-                Vector3 moveUp = new Vector3(0, up, 0);
-                    cc2.Move(moveDirection * Speed * Time.deltaTime);
-                    cc2.Move(moveUp * Speed * Time.deltaTime);
-          
-              
-              
-
-            }
-         if (IsFirstPlayer && Input.GetKeyDown(KeyCode.Tab))
-              {
+        if (IsFirstPlayer && Input.GetKeyDown(KeyCode.Tab))
+        {
             camera.SetActive(false);
             camera2.SetActive(true);
-                    IsFirstPlayer = false;
-
-            rigidBody.isKinematic = false;
-                cc.enabled = false;
-                cc2.enabled = true;
-                smoothMovement.enabled = false;
-              }else if(!IsFirstPlayer && Input.GetKeyDown(KeyCode.Tab))
-               {
+            IsFirstPlayer = false;
 
             rigidBody.isKinematic = true;
+            cc.enabled = false;
+            cc2.enabled = true;
+            smoothMovement.enabled = false;
+        }
+        else if (!IsFirstPlayer && Input.GetKeyDown(KeyCode.Tab))
+        {
+
+            rigidBody.isKinematic = false;
             camera.SetActive(true);
             camera2.SetActive(false);
-                    IsFirstPlayer = true;
-                cc.enabled = true;
-                cc2.enabled = false;
-                smoothMovement.enabled = true;
-            }     OpenMenu();
+            IsFirstPlayer = true;
+            cc.enabled = true;
+            cc2.enabled = false;
+            smoothMovement.enabled = true;
+        }
+        OpenMenu();
         if (death)
         {
             PlayerPrefs.SetInt("IsRestarted", 1); // Сохраняем флаг перезапуска
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
-    public void RespawnPlayer()=> PlayerPrefs.SetInt("IsRestarted", 1);
+    public void RespawnPlayer() => PlayerPrefs.SetInt("IsRestarted", 1);
     private void FixedUpdate()
     {
 
         if (PlayerPrefs.GetInt("IsRestarted", 0) == 1)
         {
             Checkpoint.TeleportToLastCheckpoint(transform);
-            PlayerPrefs.SetInt("IsRestarted", 0); 
+            PlayerPrefs.SetInt("IsRestarted", 0);
         }
 
     }
-   private void OpenMenu()
+    private void OpenMenu()
     {
-       
-        if (Input.GetKeyDown(KeyCode.Escape)&&isMenuOpen)
+
+        if (Input.GetKeyDown(KeyCode.Escape) && isMenuOpen)
         {
             Menu.SetActive(true);
             isMenuOpen = false;
-        }else if(Input.GetKeyDown(KeyCode.Escape) && !isMenuOpen)
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape) && !isMenuOpen)
         {
             Menu.SetActive(false);
             isMenuOpen = true;
@@ -307,6 +331,8 @@ public class PlayerController : MonoBehaviour
 
     private void Controller()
     {
+       
+
         float vertical = Input.GetAxisRaw("Vertical");
         float horizontal = Input.GetAxisRaw("Horizontal");
 
@@ -315,23 +341,62 @@ public class PlayerController : MonoBehaviour
 
         if (inputDir != Vector3.zero)
         {
+
+            if (!Input.GetKey(KeyCode.LeftShift) )
+            {
+                SpeedActive = Mathf.MoveTowards(SpeedActive, 1f, SpeedOverclocking);
+             
+            }
+            
+
+
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
             float rotationSpeed = RotateSpeed * Time.deltaTime;
             PlayerBody.transform.rotation = Quaternion.Lerp(PlayerBody.transform.rotation, targetRotation, rotationSpeed);
         }
+        else
+        {
+            if (!Input.GetKey(KeyCode.LeftShift)  )
+            {
+                SpeedActive = Mathf.MoveTowards(SpeedActive, 0f, SpeedOverclocking);
+            }
+        }
         Vector3 ladder = new Vector3(0, vertical, 0);
         Vector3 horMove = new Vector3(horizontal, 0, 0);
-            if (!LadderEnter)
+        if (!LadderEnter)
+        {
+            cc.Move(moveDirection * Speed * Time.deltaTime);
+
+        }
+        else if (LadderEnter)
+        {
+            cc.Move(horMove * Speed * Time.deltaTime);
+            cc.Move(ladder * LadderSpeed * Time.deltaTime);
+        }
+
+        if (Input.GetKey(KeyCode.LeftShift) && ground._IsGround())
+        {
+           
+            SpeedActive = Mathf.MoveTowards(SpeedActive, 2f, SpeedOverclocking);
+            Speed = Sprint;
+
+            isRun = true;
+
+        }
+        else if (Input.GetKeyUp(KeyCode.LeftShift) || !ground._IsGround())
+        {
+            if (ground._IsGround())
             {
-             cc.Move(moveDirection * Speed * Time.deltaTime);
-            
-            }else if (LadderEnter)
-            {
-             cc.Move(horMove *  Speed * Time.deltaTime);
-             cc.Move(ladder * LadderSpeed * Time.deltaTime); 
+             
+                SpeedActive = Mathf.MoveTowards(SpeedActive, 1f, SpeedOverclocking);
             }
+            Speed = (float)oldSpeed;
+
+            isRun = false;
+        }
+
     }
-   public void Gravity()
+    public void Gravity()
     {
         bool aa = false;
         if (velosity.y <= DeathHeight)
@@ -345,30 +410,30 @@ public class PlayerController : MonoBehaviour
             //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             //Checkpoint.TeleportToLastCheckpoint(playerPosition.transform);
         }
-        
-        if (ground._IsGround() && velosity.y < 0 &&!umbrellaIsOpen)
+
+        if (ground._IsGround() && velosity.y < 0 && !umbrellaIsOpen)
         {
             velosity.y = -2f;
         }
-       
-        if(umbrellaIsOpen && !ground._IsGround() && !umbrellaOnWind)
+
+        if (umbrellaIsOpen && !ground._IsGround() && !umbrellaOnWind)
         {
             if (!a)
             {
                 velosity.y = 0;
                 a = true;
-                
-            }            
+
+            }
             velosity.y += umbrellaGravity * Time.deltaTime;
-           
+
         }
 
-        if(ground._IsGround()||!umbrellaIsOpen)
+        if (ground._IsGround() || !umbrellaIsOpen)
         {
             a = false;
         }
-        
-        if (umbrellaOnWind&& umbrellaIsOpen)
+
+        if (umbrellaOnWind && umbrellaIsOpen)
         {
             velosity.y += gravity * Time.deltaTime;
 
@@ -377,7 +442,7 @@ public class PlayerController : MonoBehaviour
         if (!umbrellaIsOpen)
         {
             velosity.y += gravity * Time.deltaTime;
-            
+
         }
         cc.Move(velosity * Time.deltaTime);
     }
@@ -386,8 +451,10 @@ public class PlayerController : MonoBehaviour
         if (ground._IsGround())
         {
             velosity.y = Mathf.Sqrt(JumpHeight * -2f * gravity);
-            
+            anim.SetBool("IsJumping", true);
         }
+
+
     }
     public void Wind()
     {
@@ -425,12 +492,12 @@ public class PlayerController : MonoBehaviour
     }
     public void ResetPlayerState()
     {
-       gravity  = (float)staticGravity;
+        gravity = (float)staticGravity;
         JumpHeight = (float)oldJumpHeight;
-       
+
         umbrellaIsOpen = false;
         umbrellaOnWind = false;
-       
+
     }
 
 }
@@ -445,7 +512,7 @@ public class GroundChecker
     public float GroundDistanse = 0.4f;
     public LayerMask Ground;
     [NonSerialized] public static bool isGround;
-    public bool _IsGround()=> isGround = Physics.CheckSphere(GroundCheck.position, GroundDistanse, Ground);
+    public bool _IsGround() => isGround = Physics.CheckSphere(GroundCheck.position, GroundDistanse, Ground);
 }
 
 [Serializable]
@@ -453,9 +520,9 @@ public class Umbrella
 {
     [SerializeField] GameObject umbrella;
     public float UmbrellaJumpHeight;
-   
 
-   public void OpenUmbrella()
+
+    public void OpenUmbrella()
     {
         umbrella.SetActive(true);
 
@@ -463,9 +530,9 @@ public class Umbrella
     public void CloseUmbrella()
     {
         umbrella.SetActive(false);
-        
+
     }
 
-   
+
 }
 
