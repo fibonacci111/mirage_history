@@ -12,11 +12,7 @@ public class Checkpoint : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        if (ButtonMenager1.instance.IsDelete)
-        {
-            shouldResetCheckpoints = true;
-            ButtonMenager1.instance.IsDelete = false;
-        }
+       
 
         if (!shouldResetCheckpoints)
         {
@@ -52,12 +48,14 @@ public class Checkpoint : MonoBehaviour
     void SaveCheckpoints()
     {
         PlayerPrefs.SetInt("CheckpointCount", collectedCheckpointPositions.Count);
+        
         for (int i = 0; i < collectedCheckpointPositions.Count; i++)
         {
             PlayerPrefs.SetFloat("CheckpointPosX_" + i, collectedCheckpointPositions[i].x);
             PlayerPrefs.SetFloat("CheckpointPosY_" + i, collectedCheckpointPositions[i].y);
             PlayerPrefs.SetFloat("CheckpointPosZ_" + i, collectedCheckpointPositions[i].z);
         }
+        
         PlayerPrefs.Save();
     }
 
@@ -65,11 +63,13 @@ public class Checkpoint : MonoBehaviour
     {
         int count = PlayerPrefs.GetInt("CheckpointCount", 0);
         collectedCheckpointPositions.Clear();
+       
         for (int i = 0; i < count; i++)
         {
             float posX = PlayerPrefs.GetFloat("CheckpointPosX_" + i, 0);
             float posY = PlayerPrefs.GetFloat("CheckpointPosY_" + i, 0);
             float posZ = PlayerPrefs.GetFloat("CheckpointPosZ_" + i, 0);
+            
             collectedCheckpointPositions.Add(new Vector3(posX, posY, posZ));
         }
     }

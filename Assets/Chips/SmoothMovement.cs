@@ -15,7 +15,7 @@ public class SmoothMovement : MonoBehaviour
     private void FixedUpdate()
     {
 
-        if (gameObject.active == true&&!isPlayer)
+        if (gameObject.active == true && !isPlayer)
         {
             if (time <= LifeTime)
             {
@@ -24,7 +24,7 @@ public class SmoothMovement : MonoBehaviour
             else
             {
                 gameObject.SetActive(false);
-                
+
             }
         }
     }
@@ -39,8 +39,7 @@ public class SmoothMovement : MonoBehaviour
         {
             if (!isPlayer)
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-                PlayerController.Player_Singltone.death = true;
+                CharacterDeath.Instance.KillPlayer();
             }
         }
     }

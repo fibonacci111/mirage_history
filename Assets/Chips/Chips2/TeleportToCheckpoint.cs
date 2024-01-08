@@ -1,41 +1,41 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+//using System.Collections;
+//using System.Collections.Generic;
+//using UnityEngine;
 
-public class TeleportToCheckpoint : MonoBehaviour
-{
-    private bool onStay;
-    public Transform player;
+//public class TeleportToCheckpoint : MonoBehaviour
+//{
+//    private bool onStay;
+//    public Transform player;
+//    public Transform camera;
 
-    float timer = 0;
-    private void FixedUpdate()
-    {
-        if (onStay)
-        {
-           
+//    float timer = 0;
+//    private void FixedUpdate()
+//    {
+//        if (onStay)
+//        {
+//            Checkpoint.TeleportToLastCheckpoint(camera.transform);
 
-            Checkpoint.TeleportToLastCheckpoint(player.transform);
-            onStay= false;
+//            Checkpoint.TeleportToLastCheckpoint(player.transform);
+//            onStay= false;
 
-        }
-       
-    }
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            onStay = true;
-        }
+//        }
+
+//    }
+//    private void OnTriggerStay(Collider other)
+//    {
+//        if (other.CompareTag("Player"))
+//        {
+//            onStay = true;
+//        }
 
 
-    }
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            onStay = false;
-        }
-    }
+//    }
+//    private void OnTriggerExit(Collider other)
+//    {
+//        if (other.CompareTag("Player"))
+//        {
+//            onStay = false;
+//        }
+//    }
 
-}
-
+//}

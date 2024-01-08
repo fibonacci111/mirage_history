@@ -8,34 +8,33 @@ using UnityEngine.SceneManagement;
 public class ButtonMenager1 : MonoBehaviour
 {
     // Start is called before the first frame update
-    public  static ButtonMenager1 instance;
-    public bool IsDelete = false;
+    public static ButtonMenager1 instance;
+
+   
 
     private void Awake()
     {
-        
-
         instance = this;
     }
+
     public void LoadGame()
     {
         SceneManager.LoadScene(1);
-        
     }
 
-    // Update is called once per frame
     public void NewGame()
     {
-        PlayerPrefs.DeleteAll();
+        
         Checkpoint.TeleportToLastCheckpoint(transform);
         SceneManager.LoadScene(1);
-        Checkpoint.instance.ResetCheckpoints(); // —брос чекпоинтов
+        Checkpoint.instance.ResetCheckpoints();
     }
+
     public void TeleportClick()
     {
-        PlayerController.Player_Singltone.death = true;
-
+        CharacterDeath.Instance.isDeath = true;
     }
+
     public void MainMenu()
     {
         SceneManager.LoadScene(0);

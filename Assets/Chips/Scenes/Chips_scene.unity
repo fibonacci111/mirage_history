@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5088,6 +5088,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   camera: {fileID: 963194225}
   camera2: {fileID: 10190436}
+  rigidBody: {fileID: 0}
   smoothMovement: {fileID: 1258164018}
   Menu: {fileID: 65284393}
   playerPosition: {fileID: 926705166}
@@ -9085,7 +9086,7 @@ Transform:
   m_GameObject: {fileID: 1778391713}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.43, y: 0.57, z: -1.83}
+  m_LocalPosition: {x: -2.47, y: 0.57, z: -1.83}
   m_LocalScale: {x: 4.0193, y: 4.0193, z: 4.0193}
   m_ConstrainProportionsScale: 0
   m_Children: []
